@@ -5,6 +5,8 @@ from email.mime.application import MIMEApplication
 from email.mime.multipart import MIMEMultipart
 from email.utils import formatdate
 
+import time
+import picamera
 import smtplib
 
 from os.path import basename
@@ -16,10 +18,19 @@ def do_main():
     while True:
         take_picture()
         email = raw_input("Please enter email: ")
-        send_email(email, "tosend.png")
+        send_email(email, "foo.png")
 
 
 def take_picture():
+    with picamera.PiCamera(sensor_mode=2) as camera:
+        camera.resolution = (2592, 1944)
+        # The following is equivalent
+        # camera.resolution = camera.MAX_IMAGE_RESOLUTION
+        camera.hflip = True
+        camera.start_preview()
+        time.sleep(15)
+        # camera.stop_preview()
+        camera.capture('foo.jpg')
     print("Taking picture")
 
 
@@ -43,6 +54,7 @@ def send_email(to_address, filename):
     server.login(GOOGLE_USERNAME, GOOGLE_PASSWORD)
     server.sendmail(from_address, to_address, msg.as_string())
     server.quit()
+
 
 if __name__ == '__main__':
     do_main()
