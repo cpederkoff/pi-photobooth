@@ -3,45 +3,52 @@
 # Here are the email package modules we'll need
 from email.mime.application import MIMEApplication
 from email.mime.multipart import MIMEMultipart
-from email.utils import formatdate
 
 import time
+
+import datetime
+from os.path import basename
+
 import picamera
 import smtplib
-
-from os.path import basename
+import os
 
 GOOGLE_USERNAME = 'replace with gmail username'
 GOOGLE_PASSWORD = 'replace with application-specific password for gmail'
 
+
 def do_main():
     while True:
-        take_picture()
         email = raw_input("Please enter email: ")
-        send_email(email, "foo.png")
+        filename = str(datetime.datetime.now()) + "-" + email + ".jpg"
+        take_picture(filename)
+        try:
+            send_email(email, filename)
+        except:
+            print "Bad email"
+        os.system('clear')
 
 
-def take_picture():
+def take_picture(filename):
     with picamera.PiCamera(sensor_mode=2) as camera:
         camera.resolution = (2592, 1944)
         # The following is equivalent
         # camera.resolution = camera.MAX_IMAGE_RESOLUTION
         camera.hflip = True
         camera.start_preview()
-        time.sleep(15)
-        # camera.stop_preview()
-        camera.capture('foo.jpg')
+        time.sleep(5)
+        camera.capture(filename)
+        camera.stop_preview()
+
     print("Taking picture")
 
 
 def send_email(to_address, filename):
     from_address = GOOGLE_USERNAME + "@gmail.com"
-    msg = MIMEMultipart(
-        From=from_address,
-        To=to_address,
-        Date=formatdate(localtime=True),
-        Subject="subject"
-    )
+    msg = MIMEMultipart('mixed')
+    msg['Subject'] = "Your photobooth pictures"
+    msg['From'] = GOOGLE_USERNAME + "@gmail.com"
+    msg['To'] = to_address
     with open(filename, "rb") as fil:
         msg.attach(MIMEApplication(
             fil.read(),
