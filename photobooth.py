@@ -13,8 +13,35 @@ import picamera
 import smtplib
 import os
 
+
+import os
+import time
+import picamera # http://picamera.readthedocs.org/en/release-1.4/install2.html
+import pygame
+from signal import alarm, signal, SIGALRM, SIGKILL
+
+
+
 GOOGLE_USERNAME = 'replace with gmail username'
 GOOGLE_PASSWORD = 'replace with application-specific password for gmail'
+
+transform_x = 640
+transform_y = 480
+offset_x = 80
+offset_y = 0
+def init_pygame():
+    pygame.init()
+    size = (pygame.display.Info().current_w, pygame.display.Info().current_h)
+    pygame.display.set_caption('Photo Booth Pics')
+    pygame.mouse.set_visible(False) #hide the mouse cursor
+    return pygame.display.set_mode(size, pygame.FULLSCREEN)
+
+def show_image(image_path):
+    screen = init_pygame()
+    img=pygame.image.load(image_path)
+    img = pygame.transform.scale(img,(transform_x,transform_y))
+    screen.blit(img,(offset_x,offset_y))
+    pygame.display.flip()
 
 
 def do_main():
@@ -65,3 +92,7 @@ def send_email(to_address, filename):
 
 if __name__ == '__main__':
     do_main()
+
+
+
+
