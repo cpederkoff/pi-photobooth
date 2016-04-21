@@ -45,6 +45,7 @@ def show_image(image_path):
 
 
 def do_main():
+    init_pygame()
     while True:
         email = raw_input("Please enter email: ")
         filename = str(datetime.datetime.now()) + "-" + email + ".jpg"
